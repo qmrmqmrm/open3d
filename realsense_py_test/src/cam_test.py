@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/j/.pyenv/versions/ros_py36/bin/python3
 # -*- coding: utf-8 -*-
 import sys, os
 import open3d as o3d

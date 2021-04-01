@@ -17,8 +17,13 @@ def main():
     while not rospy.is_shutdown():
         _, frame = cap.read()
         # cv2.imshow("frame",frame)
+        cv2.imshow("sframe",frame)
+        # cv2.imshow("fram1", frame_)
+        key = cv2.waitKey(1)
         img_msg = bridge.cv2_to_imgmsg(frame, "bgr8")
+        img_msg.header.stamp = rospy.Time.now()
         pub_right.publish(img_msg)
+        print(img_msg.header)
         # cv2.waitKey(1)
         print(f"{+count}")
 

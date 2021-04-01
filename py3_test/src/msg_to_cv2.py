@@ -10,12 +10,13 @@ import open3d
 def callback(img_msg):
     bridge = CvBridge()
     frame_ = bridge.imgmsg_to_cv2(img_msg, "bgr8")
+    print(img_msg.header)
     cv2.imshow("fram",frame_)
-    key = cv2.waitKey(1000)
+    key = cv2.waitKey(1)
     
 def main():
     rospy.init_node("imgmsg_to_cv2")
-    pub_right = rospy.Subscriber('/image_right', Image,callback)
+    pub_right = rospy.Subscriber('/re_img', Image,callback)
     rospy.spin()
         
 if __name__=='__main__':
