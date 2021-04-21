@@ -2,6 +2,7 @@ import pyrealsense2 as rs
 import numpy as np
 import cv2
 import open3d as o3d
+import matplotlib.pyplot as plt
 
 # Configure depth and color streams
 pipeline = rs.pipeline()
@@ -18,7 +19,7 @@ config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
 print(device_product_line)
 
 
-config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 30)
 
 pipeline.start(config)
 
@@ -39,22 +40,35 @@ try:
 
         depth_colormap_dim = depth_colormap.shape
         color_colormap_dim = color_image.shape
+        # print(color_colormap_dim)
+        # print(depth_colormap_dim)
+
 
         # If depth and color resolutions are different, resize color image to match depth image for display
         if depth_colormap_dim != color_colormap_dim:
             resized_color_image = cv2.resize(color_image, dsize=(depth_colormap_dim[1], depth_colormap_dim[0]), interpolation=cv2.INTER_AREA)
             images = np.hstack((resized_color_image, depth_colormap))
+            # print(type(depth_colormap),depth_colormap.shape)
         else:
             images = np.hstack((color_image, depth_colormap))
-        print(type(depth_colormap),depth_colormap.shape)
+        test_img = o3d.cpu.pybind.geometry.Image(color_image)
+        print(test_img)
+        test_dep = o3d.cpu.pybind.geometry.Image(depth_colormap)
+        print(test_img)
+
         # color_raw = o3d.io.read_image(depth_colormap)
         # depth_raw = o3d.io.read_image(images)
         rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            images, depth_colormap)
+            test_img, test_dep)
+
         # Show images
-        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('RealSense', depth_colormap)
-        cv2.waitKey(1)
+        plt.subplot(1, 2, 1)
+        plt.title('Redwood grayscale image')
+        plt.imshow(rgbd_image.color)
+        plt.subplot(1, 2, 2)
+        plt.title('Redwood depth image')
+        plt.imshow(rgbd_image.depth)
+        plt.show()
 
 finally:
 

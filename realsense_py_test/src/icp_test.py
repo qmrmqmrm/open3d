@@ -58,7 +58,26 @@ def main():
     a = np.concatenate((a_, np.zeros((1000, 1))), axis=1)
     b = np.random.rand(1500).reshape(500, 3) * 5
     c = np.concatenate((a, b))
+    pcd = o3d.io.read_point_cloud("out.ply")
+    pcd2 = o3d.io.read_point_cloud("out2.ply")
+    z = np.asarray([[0.0, 0.0, 0.0]])
 
+    zero = o3d.geometry.PointCloud()
+    zero.points = o3d.utility.Vector3dVector(z)
+    zero.paint_uniform_color([1, 0, 0])
+
+    dists = pcd.compute_point_cloud_distance(zero)
+    dists = np.asarray(dists)
+    ind = np.where(dists < 4.01)[0]
+    pcd = pcd.select_by_index(ind)
+
+    dists2 = pcd2.compute_point_cloud_distance(zero)
+    dists2 = np.asarray(dists2)
+    ind = np.where(dists2 < 4.01)[0]
+    pcd2 = pcd2.select_by_index(ind)
+
+
+    print(pcd.points)
     source = o3d.geometry.PointCloud()
     source.points = o3d.utility.Vector3dVector(c)
     r = [1.55432151, -2.54513158, 1.2530725805869145]
@@ -77,7 +96,7 @@ def main():
     source.paint_uniform_color([1, 0, 0])
     target.paint_uniform_color([0, 1, 0])
     zero.paint_uniform_color([0, 0, 0])
-    o3d.visualization.draw_geometries([source, target, zero])
+    o3d.visualization.draw_geometries([pcd, pcd2, zero])
 
     threshold = 1
     zero_init = np.eye(4)
@@ -89,12 +108,12 @@ def main():
         # for n in range(100):
         # sig = o3d.pipelines.registration.TukeyLoss(k=0.1)
         # print("zero_init",zero_init)
-        reg_p2p = o3d.pipelines.registration.registration_icp(target, source, threshold, zero_init,
+        reg_p2p = o3d.pipelines.registration.registration_icp(pcd, pcd2, threshold, zero_init,
                                                               o3d.pipelines.registration.TransformationEstimationPointToPoint(),
                                                               o3d.pipelines.registration.ICPConvergenceCriteria(
                                                                   max_iteration=2000))
         cor = np.asarray(reg_p2p.correspondence_set).shape
-        target.transform(reg_p2p.transformation)
+        pcd.transform(reg_p2p.transformation)
         trans = reg_p2p.transformation
         marge_t = zero_init @ reg_p2p.transformation
         zero_init = reg_p2p.transformation
@@ -107,7 +126,7 @@ def main():
                 print("fall")
                 d_max = False
 
-    o3d.visualization.draw_geometries([source, target, zero])
+    o3d.visualization.draw_geometries([pcd, pcd2, zero])
 
 
 if __name__ == '__main__':
