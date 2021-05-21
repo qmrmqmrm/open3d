@@ -1,18 +1,9 @@
 #!/home/j/.pyenv/versions/ros_py36/bin/python3
 
-import rospy
-from cv_bridge import CvBridge, CvBridgeError
-import pyrealsense2 as rs
-import cv2
-import tf
 import numpy as np
-from std_msgs.msg import Int32
-from sensor_msgs.msg import Image, PointCloud2, Imu
-import open3d as o3d
-import matplotlib.pyplot as plt
-from open3d_ros_helper import open3d_ros_helper as orh
-from geometry_msgs.msg import Pose, Quaternion, Point, PoseStamped
-import math
+import rospy
+import tf
+from sensor_msgs.msg import Imu
 
 
 class Merge_IMU:
@@ -49,7 +40,7 @@ class Merge_IMU:
         self.pitch += self.gyro.angular_velocity.y * d_t
         self.yaw += self.gyro.angular_velocity.z * d_t
         self.x += self.accel.linear_acceleration.x * d_t
-        self.y += (self.accel.linear_acceleration.y+9.7478) * d_t
+        self.y += (self.accel.linear_acceleration.y + 9.7478) * d_t
         self.z += self.accel.linear_acceleration.z * d_t
 
         x, y, z, w = tf.transformations.quaternion_from_euler(self.roll, self.pitch, self.yaw)
@@ -57,7 +48,7 @@ class Merge_IMU:
         print(f"self.x : {self.accel.linear_acceleration.x :0.4f}, self.y : {self.accel.linear_acceleration.y:.4f},"
               f"self.z : {self.accel.linear_acceleration.z:.4f}")
 
-        br.sendTransform((self.x , self.y,self.z),
+        br.sendTransform((self.x, self.y, self.z),
                          (x, y, z, w),
                          rospy.Time.now(),
                          "camera_depth_cutting",

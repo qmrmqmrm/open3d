@@ -1,16 +1,14 @@
 #!/home/j/.pyenv/versions/ros_py36/bin/python3
 
-import rospy
-from cv_bridge import CvBridge, CvBridgeError
-import cv2
+import copy
+
 import numpy as np
 # from std_msgs.msg import Int32
-from sensor_msgs.msg import Image, PointCloud2
 import open3d as o3d
-import copy
+import rospy
+
+
 # import numpy
-import matplotlib.pyplot as plt
-from open3d_ros_helper import open3d_ros_helper as orh
 
 
 def draw_registration_result(source, target, transformation):
@@ -75,7 +73,6 @@ def main():
     dists2 = np.asarray(dists2)
     ind = np.where(dists2 < 4.01)[0]
     pcd2 = pcd2.select_by_index(ind)
-
 
     print(pcd.points)
     source = o3d.geometry.PointCloud()

@@ -1,16 +1,11 @@
 #!/home/j/.pyenv/versions/ros_py36/bin/python3
 
 import rospy
-from cv_bridge import CvBridge, CvBridgeError
-import pyrealsense2 as rs
-import cv2
-import tf
 import numpy as np
 # from std_msgs.msg import Int32
-from sensor_msgs.msg import Image, PointCloud2
+from sensor_msgs.msg import PointCloud2
 import open3d as o3d
 # import numpy
-import matplotlib.pyplot as plt
 from open3d_ros_helper import open3d_ros_helper as orh
 
 
@@ -50,13 +45,12 @@ def depth_callback(point):
     # print(pcd_without_chair.points)
     ros_msg = orh.o3dpc_to_rospc(pcd_without_chair)
     ros_msg.header.frame_id = "camera_depth_cutting"
-    pub = rospy.Publisher('test_point2',PointCloud2,queue_size=1)
+    pub = rospy.Publisher('test_point2', PointCloud2, queue_size=1)
     # print(f"\nros_msg\nheight : {ros_msg.height}\n"
     #       f"width  : {ros_msg.width}\n"
     #       f"point_step : {ros_msg.point_step}\n"
     #       f"header : {ros_msg.header}\n")
     pub.publish(ros_msg)
-
 
 
 def main():

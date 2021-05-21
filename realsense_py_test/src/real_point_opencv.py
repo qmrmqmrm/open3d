@@ -196,6 +196,7 @@ def frustum(out, intrinsics, color=(0x40, 0x40, 0x40)):
 def pointcloud(out, verts, texcoords, color, painter=True):
     """draw point cloud with optional painter's algorithm"""
     if painter:
+
         # Painter's algo, sort points from back to front
 
         # get reverse sorted indices by z (in view-space)
@@ -259,6 +260,7 @@ while True:
         depth_colormap = np.asanyarray(
             colorizer.colorize(depth_frame).get_data())
 
+
         if state.color:
             mapped_frame, color_source = color_frame, color_image
         else:
@@ -269,11 +271,11 @@ while True:
 
         # Pointcloud data to arrays
         v, t = points.get_vertices(), points.get_texture_coordinates()
-        print(v, t)
+        # print(v, t)
         verts = np.asanyarray(v).view(np.float32).reshape(-1, 3)  # xyz
         texcoords = np.asanyarray(t).view(np.float32).reshape(-1, 2)  # uv
-        print(texcoords)
-    # Render
+        # print(texcoords)
+    # Renderd
     now = time.time()
 
     out.fill(0)
@@ -283,8 +285,10 @@ while True:
     axes(out, view([0, 0, 0]), state.rotation, size=0.1, thickness=1)
 
     if not state.scale or out.shape[:2] == (h, w):
+        print("f")
         pointcloud(out, verts, texcoords, color_source)
     else:
+        print("s")
         tmp = np.zeros((h, w, 3), dtype=np.uint8)
         pointcloud(tmp, verts, texcoords, color_source)
         tmp = cv2.resize(
@@ -293,8 +297,12 @@ while True:
 
     if any(state.mouse_btns):
         axes(out, view(state.pivot), state.rotation, thickness=4)
+    cv2.imshow("test", out)
+    cv2.waitKey(1)
+
 
     dt = time.time() - now
+    print(out.shape)
 
     cv2.setWindowTitle(
         state.WIN_NAME, "RealSense (%dx%d) %dFPS (%.2fms) %s" %
@@ -310,9 +318,10 @@ while True:
         state.paused ^= True
 
     if key == ord("d"):
+
         state.decimate = (state.decimate + 1) % 3
         decimate.set_option(rs.option.filter_magnitude, 2 ** state.decimate)
-
+        print(state.decimate)
     if key == ord("z"):
         state.scale ^= True
 
